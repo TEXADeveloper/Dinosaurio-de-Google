@@ -2,8 +2,11 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private float gravityScale = 9.8f;
-    [SerializeField] private float jumpHeight = 5;
+    [SerializeField] private Animator anim;
+    [SerializeField] private Rigidbody rb;
+    [SerializeField] private float jumpMultiplier = 5;
+    [SerializeField] private float fallMultiplier = 7;
+    [SerializeField] private float checkDistance = 0.3f;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float maxJumpTime = 1;
     private float jumpTime = 0;
@@ -12,44 +15,59 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && grounded)
+        if (Input.GetKeyDown(KeyCode.Space) /*&& grounded*/)
         {
             jumping = true;
             grounded = false;
+            anim.SetBool("Grounded", false);
+            anim.SetBool("Jumping", true);
         }
         if (Input.GetKeyUp(KeyCode.Space))
+        {
             jumping = false;
+            anim.SetBool("Jumping", false);
+            anim.SetBool("Falling", true);
+        }
     }
 
     void FixedUpdate()
     {
         if (jumping)
             jump();
+        else
+            fall();
 
         if (!grounded && !jumping)
-            gravity();
+            isGrounded();
     }
 
-    void jump()
+    private void jump()
     {
         jumpTime += Time.fixedDeltaTime;
         if (jumpTime >= maxJumpTime)
         {
             jumping = false;
+            anim.SetBool("Jumping", false);
+            anim.SetBool("Falling", true);
             return;
         }
-        transform.Translate(Vector3.up * jumpHeight * Time.fixedDeltaTime);
+        rb.velocity += Vector3.up * jumpMultiplier * Time.fixedDeltaTime * 1/jumpTime;
     }
 
-    private void gravity()
+    private void fall()
     {
-        RaycastHit[] rays = Physics.RaycastAll(transform.position + Vector3.up * 0.05f, Vector3.down, gravityScale * Time.fixedDeltaTime, groundLayer);
-        if (rays.Length > 0)
+        rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
+    }
+
+    private void isGrounded()
+    {
+        bool hit = Physics.Raycast(transform.position + Vector3.up * 0.05f, Vector3.down, checkDistance, groundLayer);
+        if (hit)
         {
-            this.transform.position = new Vector3(transform.position.x, rays[0].point.y, transform.position.z);
-            grounded = true;
+            anim.SetBool("Falling", false);
+            anim.SetBool("Grounded", true);
+            grounded = hit;
             jumpTime = 0;
-        } else
-            transform.Translate(Vector3.down * gravityScale * Time.fixedDeltaTime);
+        }
     }
 }

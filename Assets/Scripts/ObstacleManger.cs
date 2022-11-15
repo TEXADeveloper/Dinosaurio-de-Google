@@ -11,8 +11,11 @@ public class ObstacleManger : MonoBehaviour
 
     void Start()
     {
-        foreach (Obstacle t in availableParent.GetComponentsInChildren<Obstacle>())
-            availableObjects.Add(t.gameObject);
+        foreach (Obstacle o in availableParent.GetComponentsInChildren<Obstacle>())
+        {
+            availableObjects.Add(o.gameObject);
+            o.gameObject.SetActive(false);
+        }
     }
 
     private void spawnRandom()
