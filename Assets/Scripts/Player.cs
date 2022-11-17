@@ -4,18 +4,21 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private Animator anim;
     [SerializeField] private Rigidbody rb;
-    [SerializeField] private float jumpMultiplier = 5;
-    [SerializeField] private float fallMultiplier = 7;
-    [SerializeField] private float checkDistance = 0.3f;
+    [SerializeField] private float jumpMultiplier = 4;
+    [SerializeField] private float fallMultiplier = 6;
+    [SerializeField] private float fallImpulseMultiplier = 4;
+    [SerializeField] private float checkDistance = .3f;
     [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private float maxJumpTime = 1;
+    [SerializeField] private float maxJumpTime = .3f;
     private float jumpTime = 0;
-    public bool jumping = false;
-    public bool grounded = false;
+    private bool jumping = false;
+    private bool grounded = false;
+    private float impulseMultiplier = 1;
+    private bool died = false;
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) /*&& grounded*/)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             jumping = true;
             grounded = false;
@@ -28,10 +31,18 @@ public class Player : MonoBehaviour
             anim.SetBool("Jumping", false);
             anim.SetBool("Falling", true);
         }
+
+        if (Input.GetKeyDown(KeyCode.S))
+            impulseMultiplier = fallImpulseMultiplier;
+        if (Input.GetKeyUp(KeyCode.S))
+            impulseMultiplier = 1;
     }
 
     void FixedUpdate()
     {
+        if (died)
+            return;
+
         if (jumping)
             jump();
         else
@@ -56,7 +67,7 @@ public class Player : MonoBehaviour
 
     private void fall()
     {
-        rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
+        rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime * impulseMultiplier;
     }
 
     private void isGrounded()
@@ -68,6 +79,16 @@ public class Player : MonoBehaviour
             anim.SetBool("Grounded", true);
             grounded = hit;
             jumpTime = 0;
+        }
+    }
+
+    void OnCollisionEnter(Collision col)
+    {
+        if (col.transform.tag.Equals("Obstacle"))
+        {
+            rb.constraints = RigidbodyConstraints.None;
+            died = true;
+            anim.SetBool("Died", true);
         }
     }
 }
