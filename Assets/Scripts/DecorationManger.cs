@@ -14,9 +14,11 @@ public class DecorationManger : MonoBehaviour
     [SerializeField] private Transform availableParent;
     [SerializeField] private List<GameObject> availableObjects;
     private List<GameObject> movingObjects = new List<GameObject>();
+    private bool died = false;
 
     void Start()
     {
+        Player.PlayerDeath += death;
         ObstacleManger.Accelerate += speedUp;
         foreach (Transform t in availableParent.GetComponentsInChildren<Transform>())
         {
@@ -31,7 +33,7 @@ public class DecorationManger : MonoBehaviour
     void Update()
     {
         spawn += Time.deltaTime;
-        if (spawn >= spawnCooldown)
+        if (spawn >= spawnCooldown && !died)
         {
             spawn = 0;
             spawnRandom();
@@ -62,6 +64,11 @@ public class DecorationManger : MonoBehaviour
         caller.SetActive(false);
     }
 
+    private void death()
+    {
+        died = true;
+    }
+
     private void speedUp(float amount)
     {
         this.speed += amount;
@@ -69,6 +76,7 @@ public class DecorationManger : MonoBehaviour
 
     void OnDisable()
     {
+        Player.PlayerDeath -= death;
         ObstacleManger.Accelerate -= speedUp;
     }
 }

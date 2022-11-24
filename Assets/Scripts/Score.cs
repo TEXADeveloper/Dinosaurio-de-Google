@@ -4,6 +4,7 @@ using TMPro;
 public class Score : MonoBehaviour
 {
     [SerializeField] private TMP_Text text;
+    [SerializeField] private TMP_Text resultsText;
     private float timer = 0;
 
     [SerializeField] private Animator skyAnimator;
@@ -22,5 +23,8 @@ public class Score : MonoBehaviour
             changed = false;
     }
 
-
+    void OnDisable()
+    {
+        resultsText.text = "Score: " + (Mathf.Floor(timer * 100)/100).ToString();
+    }
 }

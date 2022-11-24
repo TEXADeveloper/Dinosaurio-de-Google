@@ -6,11 +6,6 @@ public class Decoration : MonoBehaviour
     private bool move = false;
     private DecorationManger dM;
 
-    void Start()
-    {
-        ObstacleManger.Accelerate += speedUp;
-    }
-
     public void SetManager(DecorationManger manager, float value)
     {
         dM = manager;
@@ -20,6 +15,8 @@ public class Decoration : MonoBehaviour
     void OnEnable()
     {
         move = true;
+        ObstacleManger.Accelerate += speedUp;
+        Player.PlayerDeath += death;
     }
 
     void FixedUpdate()
@@ -30,10 +27,16 @@ public class Decoration : MonoBehaviour
             dM.Despawn(this.gameObject);
     }
 
+    private void death()
+    {
+        move = false;
+    }
+
     void OnDisable()
     {
         move = false;
         ObstacleManger.Accelerate -= speedUp;
+        Player.PlayerDeath -= death;
     }
 
     private void speedUp(float amount)

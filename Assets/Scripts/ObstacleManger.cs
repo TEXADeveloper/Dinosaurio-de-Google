@@ -9,6 +9,8 @@ public class ObstacleManger : MonoBehaviour
     [SerializeField] private float accelerationAmount = 0.3f;
     [SerializeField] private float maxSpeed = 15;
 
+    [SerializeField] private GameObject pterodactylObject;
+    [SerializeField] private int amount = 3;
     [SerializeField] private Transform spawnPosition;
     [SerializeField] private Transform movingParent;
     [SerializeField] private Transform availableParent;
@@ -17,14 +19,16 @@ public class ObstacleManger : MonoBehaviour
 
     void Start()
     {
+        if (DinoData.DD.Configured)
+            for(int i = 0 ; i < amount ; i++)
+                GameObject.Instantiate(pterodactylObject, new Vector3(0, -5, 0), Quaternion.identity, availableParent);
+        
         foreach (Transform t in availableParent.GetComponentsInChildren<Transform>())
-        {
             if (t.tag.Equals("Obstacle"))
             {
                 availableObjects.Add(t.gameObject);
                 t.gameObject.SetActive(false);
             }
-        }
     }
 
     public void SpawnRandom()

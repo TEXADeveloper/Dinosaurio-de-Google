@@ -6,11 +6,6 @@ public class Obstacle : MonoBehaviour
     private bool move = false;
     private ObstacleManger oM;
 
-    void Start()
-    {
-        ObstacleManger.Accelerate += speedUp;
-    }
-
     public void SetManager(ObstacleManger manager, float value)
     {
         oM = manager;
@@ -20,6 +15,8 @@ public class Obstacle : MonoBehaviour
     void OnEnable()
     {
         move = true;
+        ObstacleManger.Accelerate += speedUp;
+        Player.PlayerDeath += death;
     }
 
     void FixedUpdate()
@@ -34,12 +31,18 @@ public class Obstacle : MonoBehaviour
     {
         move = false;
         ObstacleManger.Accelerate -= speedUp;
+        Player.PlayerDeath -= death;
     }
 
     void OnTriggerEnter(Collider col)
     {
         if (col.tag.Equals("Player"))
             oM.SpeedUp();
+    }
+
+    private void death()
+    {
+        move = false;
     }
 
     private void speedUp(float amount)

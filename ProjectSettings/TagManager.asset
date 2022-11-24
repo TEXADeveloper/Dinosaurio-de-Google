@@ -15,7 +15,7 @@ TagManager:
   - UI
   - Ground
   - Obstacle
-  - 
+  - TRex
   - 
   - 
   - 
@@ -42,4 +42,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Canvas
+    uniqueID: 2604184777
+    locked: 0
+  - name: Pterodactyl
+    uniqueID: 1200039979
     locked: 0
